@@ -6,8 +6,8 @@ class JiraIssue {
 class PlanTask {
   final String key;
   String summary;
-  double estimate; // planned hours
-  double worked; // hours worked (EoD)
+  double estimate;
+  double worked;
   String note; // worklog description
   bool logged; // already logged in Jira
   bool inPlan; // false = added only at EoD
