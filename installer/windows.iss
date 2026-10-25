@@ -10,7 +10,8 @@
 #ifndef SourceDir
   #define SourceDir "..\build\windows\x64\runner\Release"
 #endif
-#define MyAppName "Jira Automizer"
+#define MyAppName "Jira Mate"
+
 
 [Setup]
 ; Keep this GUID the same forever so upgrades replace the old install
@@ -28,10 +29,10 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+SetupIconFile=..\windows\runner\resources\app_icon.ico
 ; Installs to C:\Program Files by default (asks for admin).
 ; The dialog also lets a user without admin rights install for themselves only.
 PrivilegesRequired=admin
-PrivilegesRequiredOverridesAllowed=dialog
 UninstallDisplayIcon={app}\{#MyAppExe}
 ; The app hides in the tray, so close it automatically during upgrades
 CloseApplications=yes

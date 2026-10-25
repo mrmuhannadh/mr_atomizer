@@ -85,8 +85,9 @@ jobs:
       - name: Upload Windows ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: jira-notifier-windows
-          path: release-assets/jira-notifier-windows.zip
+          name: windows-release
+          path: release-assets/jira-notifier-windows-setup.exe
+
           if-no-files-found: error
 
   macos:
