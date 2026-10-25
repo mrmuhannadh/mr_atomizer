@@ -175,9 +175,6 @@ class Recipient {
   Recipient(this.name, this.email);
 }
 
-/// Parses "a@x.com, Priya Nair <priya@x.com>; b@x.com".
-/// If no display name is given, one is derived from the email
-/// (ravi.kumar@x.com -> Ravi).
 List<Recipient> parseRecipients(String raw) {
   final out = <Recipient>[];
   for (final part in raw.split(RegExp(r'[;,]'))) {
