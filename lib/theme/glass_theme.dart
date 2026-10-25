@@ -168,7 +168,7 @@ class _GlassTransitions extends PageTransitionsBuilder {
       Animation<double> secondaryAnimation,
       Widget child,
       ) =>
-      const CupertinoPageTransitionsBuilder().buildTransitions<T>(
+      CupertinoPageTransitionsBuilder().buildTransitions<T>(
           route, context, animation, secondaryAnimation,
           GlassBackground(child: child));
 }

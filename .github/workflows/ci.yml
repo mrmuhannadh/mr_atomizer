@@ -26,6 +26,13 @@ jobs:
 
       - run: flutter pub get
       - run: flutter analyze
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - run: flutter build apk --release
 
   windows:
