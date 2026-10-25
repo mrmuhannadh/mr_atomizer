@@ -252,7 +252,7 @@ class _PlannerSettingsScreenState extends State<PlannerSettingsScreen> {
             contentPadding: EdgeInsets.zero,
             title: const Text('Simple mode (plain text)'),
             subtitle: const Text(
-                'Windows/Mac only. Off = formatted table draft. On = plain-text link, use this if the draft does not open in Outlook.'),
+                'Off = formatted table draft. On = plain-text link'),
             value: _simple,
             onChanged: (v) => setState(() => _simple = v),
           ),

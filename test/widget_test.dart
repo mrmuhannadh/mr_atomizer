@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:jira_manager/main.dart';
 
 void main() {
-  testWidgets('Jira Notifier app starts', (WidgetTester tester) async {
+  testWidgets('Jira Mate app starts', (WidgetTester tester) async {
     await tester.pumpWidget(
       const JiraNotifierApp(
         connected: false,

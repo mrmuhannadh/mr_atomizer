@@ -204,7 +204,7 @@ class EmailService {
     final m = Message()
       ..from = Address(p.fromEmail.trim(), p.signature.trim())
       ..recipients.add(Address(p.fromEmail.trim()))
-      ..subject = 'Jira Notifier test email'
+      ..subject = 'Jira Mate test email'
       ..text = 'Your email settings work. You can now send task plans and EoD emails.';
     await _sendMail(m, _server(p, password));
   }

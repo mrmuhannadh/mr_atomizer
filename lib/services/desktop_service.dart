@@ -16,14 +16,14 @@ class DesktopService with TrayListener, WindowListener {
     await trayManager.setIcon(
         Platform.isWindows ? 'assets/tray_icon.ico' : 'assets/tray_icon.png');
     await trayManager.setContextMenu(Menu(items: [
-      MenuItem(key: 'show', label: 'Open Jira Notifier'),
+      MenuItem(key: 'show', label: 'Open Jira Mate'),
       MenuItem.separator(),
       MenuItem(key: 'quit', label: 'Quit'),
     ]));
     trayManager.addListener(_i);
 
     launchAtStartup.setup(
-        appName: 'Jira Notifier', appPath: Platform.resolvedExecutable);
+        appName: 'Jira Mate', appPath: Platform.resolvedExecutable);
     await launchAtStartup.enable();
   }
 

@@ -24,7 +24,7 @@ class NotificationService {
         iOS: DarwinInitializationSettings(),
         macOS: DarwinInitializationSettings(),
         windows: WindowsInitializationSettings(
-          appName: 'Jira Notifier',
+          appName: 'Jira Mate',
           appUserModelId: 'com.example.JiraNotifier',
           guid: '6f1d1d5e-3a2b-4c9e-9a53-0c1f6c2b7a10', // generate your own GUID
         ),

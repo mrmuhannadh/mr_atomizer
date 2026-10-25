@@ -21,7 +21,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   static const _pages = [
     _Info(Icons.timer_outlined, 'Never forget to log time',
-        'Jira Notifier checks your worklogs on weekdays and nudges you '
+        'Jira Mate checks your worklogs on weekdays and nudges you '
             'when you are short of your daily hours.'),
     _Info(Icons.alarm, 'Reminders on your schedule',
         'Choose the reminder time, the days, and the minimum hours. '
