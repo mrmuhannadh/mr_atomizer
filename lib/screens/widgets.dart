@@ -129,7 +129,7 @@ class _IssuePickerState extends State<_IssuePicker> {
     if (_results.isEmpty) return const Center(child: Text('No tasks found.'));
     return ListView.separated(
       itemCount: _results.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (_, i) {
         final it = _results[i];
         final already = widget.exclude.contains(it.key);
