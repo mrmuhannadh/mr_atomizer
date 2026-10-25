@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jira_manager/theme/glass_theme.dart';
-import '../models/settings.dart';
 import '../models/worklog_entry.dart';
 import '../services/jira_service.dart';
 import '../services/storage_service.dart';
@@ -142,7 +141,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: Row(children: [
             Expanded(
               child: DropdownButtonFormField<RangeMode>(
-                value: _mode,
+                initialValue: _mode,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     contentPadding:

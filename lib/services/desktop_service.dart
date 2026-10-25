@@ -40,11 +40,11 @@ class DesktopService with TrayListener, WindowListener {
   void onTrayIconRightMouseDown() => trayManager.popUpContextMenu();
 
   @override
-  void onTrayMenuItemClick(MenuItem item) async {
-    if (item.key == 'show') {
+  void onTrayMenuItemClick(MenuItem menuItem) async {
+    if (menuItem.key == 'show') {
       await windowManager.show();
       await windowManager.focus();
-    } else if (item.key == 'quit') {
+    } else if (menuItem.key == 'quit') {
       await windowManager.setPreventClose(false);
       await windowManager.destroy();
     }

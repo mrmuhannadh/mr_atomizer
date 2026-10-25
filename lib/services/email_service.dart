@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/planner.dart';
 import '../utils/format.dart';
 import 'planner_storage.dart';
 import 'storage_service.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Everything needed to send an email by any method.
 class EmailDraft {

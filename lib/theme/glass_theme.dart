@@ -118,23 +118,23 @@ class GlassBackground extends StatelessWidget {
   final Widget child;
   const GlassBackground({super.key, required this.child});
 
-  Widget _glow(Color c, double size,
-      {double? top, double? left, double? right, double? bottom}) =>
-      Positioned(
-        top: top,
-        left: left,
-        right: right,
-        bottom: bottom,
-        child: IgnorePointer(
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(colors: [c, c.withAlpha(0)])),
-          ),
-        ),
-      );
+  // Widget _glow(Color c, double size,
+  //     {double? top, double? left, double? right, double? bottom}) =>
+  //     Positioned(
+  //       top: top,
+  //       left: left,
+  //       right: right,
+  //       bottom: bottom,
+  //       child: IgnorePointer(
+  //         child: Container(
+  //           width: size,
+  //           height: size,
+  //           decoration: BoxDecoration(
+  //               shape: BoxShape.circle,
+  //               gradient: RadialGradient(colors: [c, c.withAlpha(0)])),
+  //         ),
+  //       ),
+  //     );
 
   @override
   Widget build(BuildContext context) {

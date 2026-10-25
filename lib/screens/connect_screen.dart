@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/settings.dart';
 import '../services/jira_service.dart';
 import '../services/storage_service.dart';
@@ -14,9 +13,6 @@ class ConnectScreen extends StatefulWidget {
 }
 
 class _ConnectScreenState extends State<ConnectScreen> {
-  static const _tokenPage =
-      'https://id.atlassian.com/manage-profile/security/api-tokens';
-
   final _formKey = GlobalKey<FormState>();
   final _url = TextEditingController();
   final _email = TextEditingController();
@@ -74,17 +70,17 @@ class _ConnectScreenState extends State<ConnectScreen> {
     }
   }
 
-  Future<void> _openTokenPage() async {
-    try {
-      final ok = await launchUrl(Uri.parse(_tokenPage),
-          mode: LaunchMode.externalApplication);
-      if (ok) return;
-    } catch (_) {}
-    await Clipboard.setData(const ClipboardData(text: _tokenPage));
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Could not open the browser. Link copied instead.')));
-  }
+  // Future<void> _openTokenPage() async {
+  //   try {
+  //     final ok = await launchUrl(Uri.parse(_tokenPage),
+  //         mode: LaunchMode.externalApplication);
+  //     if (ok) return;
+  //   } catch (_) {}
+  //   await Clipboard.setData(const ClipboardData(text: _tokenPage));
+  //   if (!mounted) return;
+  //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //       content: Text('Could not open the browser. Link copied instead.')));
+  // }
 
   Future<void> _connect() async {
     if (!_formKey.currentState!.validate()) return;
@@ -127,14 +123,14 @@ class _ConnectScreenState extends State<ConnectScreen> {
     }
   }
 
-  Widget _step(int n, String text) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      CircleAvatar(radius: 11, child: Text('$n', style: const TextStyle(fontSize: 12))),
-      const SizedBox(width: 10),
-      Expanded(child: Text(text)),
-    ]),
-  );
+  // Widget _step(int n, String text) => Padding(
+  //   padding: const EdgeInsets.symmetric(vertical: 4),
+  //   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  //     CircleAvatar(radius: 11, child: Text('$n', style: const TextStyle(fontSize: 12))),
+  //     const SizedBox(width: 10),
+  //     Expanded(child: Text(text)),
+  //   ]),
+  // );
 
   @override
   Widget build(BuildContext context) {

@@ -78,7 +78,7 @@ class JiraService {
         'jql': jql,
         'fields': 'summary',
         'maxResults': 100,
-        if (pageToken != null) 'nextPageToken': pageToken,
+        'nextPageToken': ?pageToken,
       });
       issues.addAll((res.data['issues'] as List).cast<Map<String, dynamic>>());
       pageToken = res.data['isLast'] == true
