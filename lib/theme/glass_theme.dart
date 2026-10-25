@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 /// Put this file at lib/theme/glass_theme.dart
 class GlassTheme {
@@ -167,8 +168,7 @@ class _GlassTransitions extends PageTransitionsBuilder {
       Animation<double> animation,
       Animation<double> secondaryAnimation,
       Widget child,
-      ) =>
-      CupertinoPageTransitionsBuilder().buildTransitions<T>(
+      ) => CupertinoPageTransitionsBuilder().buildTransitions<T>(
           route, context, animation, secondaryAnimation,
           GlassBackground(child: child));
 }
