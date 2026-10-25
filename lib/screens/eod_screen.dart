@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:jira_manager/theme/glass_theme.dart';
 import '../models/planner.dart';
 import '../services/email_service.dart';
 import '../services/jira_service.dart';
@@ -51,7 +50,7 @@ class _EodScreenState extends State<EodScreen> {
     setState(() {
       for (final i in picked) {
         d.tasks.add(PlanTask(
-            key: i.key, summary: i.summary, estimate: 0, worked: 1, inPlan: false));
+            key: i.key, summary: i.summary, status: i.status, estimate: 0, worked: 1, inPlan: false));
       }
     });
     await PlannerStorage.saveDay(d);
@@ -111,7 +110,7 @@ class _EodScreenState extends State<EodScreen> {
         await jira.addWorklog(t.key, secs, start, t.note);
         t.logged = true;
         offset += secs;
-        await PlannerStorage.saveDay(d);
+        await PlannerStorage.saveDay(d); // remember, so a retry never double-logs
       } on DioException catch (e) {
         failures.add('${t.key}: ${_dioMsg(e)}');
       } catch (e) {
@@ -205,7 +204,7 @@ class _EodScreenState extends State<EodScreen> {
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Center(child: Text('No tasks yet. Add what you worked on.'))),
         for (final t in d.tasks)
-          GlassCard(
+          Card(
             key: ValueKey('eod-${t.key}'),
             child: Padding(
               padding: const EdgeInsets.all(12),

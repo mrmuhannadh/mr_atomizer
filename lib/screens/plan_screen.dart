@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jira_manager/theme/glass_theme.dart';
 import '../models/planner.dart';
 import '../services/email_service.dart';
 import '../services/notification_service.dart';
@@ -48,7 +47,8 @@ class _PlanScreenState extends State<PlanScreen> {
         if (existing.isNotEmpty) {
           existing.first.inPlan = true; // was an EoD-only task
         } else {
-          d.tasks.add(PlanTask(key: i.key, summary: i.summary, estimate: 1));
+          d.tasks.add(PlanTask(
+              key: i.key, summary: i.summary, status: i.status, estimate: 1));
         }
       }
     });
@@ -126,7 +126,7 @@ class _PlanScreenState extends State<PlanScreen> {
         Text(prettyDate(DateTime.now()),
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        GlassCard(
+        Card(
           child: ListTile(
             leading: const Icon(Icons.people_outline),
             title: Text(p.to.trim().isEmpty ? 'To: not set' : 'To: ${p.to}'),
@@ -156,7 +156,7 @@ class _PlanScreenState extends State<PlanScreen> {
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Center(child: Text('No tasks yet. Add the tasks you plan to work on.'))),
         for (final t in tasks)
-          GlassCard(
+          Card(
             key: ValueKey(t.key),
             child: Padding(
               padding: const EdgeInsets.all(12),

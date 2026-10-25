@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jira_manager/theme/glass_theme.dart';
 import '../models/planner.dart';
 import '../models/settings.dart';
 import '../services/background_service.dart';
@@ -110,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Widget _plannerCard() {
     if (!_planner.enabled) {
-      return GlassCard(
+      return Card(
         child: ListTile(
           leading: const Icon(Icons.mark_email_read_outlined),
           title: const Text('Automate your daily emails'),
@@ -126,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final plannedH = planned.fold<double>(0, (a, t) => a + t.estimate);
     final worked = d.tasks.where((t) => t.worked > 0 && t.logged).fold<double>(0, (a, t) => a + t.worked);
 
-    return GlassCard(
+    return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

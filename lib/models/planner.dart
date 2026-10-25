@@ -6,8 +6,9 @@ class JiraIssue {
 class PlanTask {
   final String key;
   String summary;
-  double estimate;
-  double worked;
+  String status; // Jira status when the task was added
+  double estimate; // planned hours
+  double worked; // hours worked (EoD)
   String note; // worklog description
   bool logged; // already logged in Jira
   bool inPlan; // false = added only at EoD
@@ -15,6 +16,7 @@ class PlanTask {
   PlanTask({
     required this.key,
     required this.summary,
+    this.status = '',
     this.estimate = 1,
     this.worked = 0,
     this.note = '',
@@ -23,24 +25,26 @@ class PlanTask {
   });
 
   Map<String, dynamic> toJson() => {
-        'key': key,
-        'summary': summary,
-        'estimate': estimate,
-        'worked': worked,
-        'note': note,
-        'logged': logged,
-        'inPlan': inPlan,
-      };
+    'key': key,
+    'summary': summary,
+    'status': status,
+    'estimate': estimate,
+    'worked': worked,
+    'note': note,
+    'logged': logged,
+    'inPlan': inPlan,
+  };
 
   factory PlanTask.fromJson(Map<String, dynamic> j) => PlanTask(
-        key: j['key'] as String,
-        summary: (j['summary'] ?? '') as String,
-        estimate: (j['estimate'] as num?)?.toDouble() ?? 1,
-        worked: (j['worked'] as num?)?.toDouble() ?? 0,
-        note: (j['note'] ?? '') as String,
-        logged: j['logged'] == true,
-        inPlan: j['inPlan'] != false,
-      );
+    key: j['key'] as String,
+    summary: (j['summary'] ?? '') as String,
+    status: (j['status'] ?? '') as String,
+    estimate: (j['estimate'] as num?)?.toDouble() ?? 1,
+    worked: (j['worked'] as num?)?.toDouble() ?? 0,
+    note: (j['note'] ?? '') as String,
+    logged: j['logged'] == true,
+    inPlan: j['inPlan'] != false,
+  );
 }
 
 class DayPlan {
@@ -61,24 +65,24 @@ class DayPlan {
   }) : tasks = tasks ?? [];
 
   Map<String, dynamic> toJson() => {
-        'date': date,
-        'tasks': tasks.map((t) => t.toJson()).toList(),
-        'planSent': planSent,
-        'eodSent': eodSent,
-        'planMessageId': planMessageId,
-        'planSubject': planSubject,
-      };
+    'date': date,
+    'tasks': tasks.map((t) => t.toJson()).toList(),
+    'planSent': planSent,
+    'eodSent': eodSent,
+    'planMessageId': planMessageId,
+    'planSubject': planSubject,
+  };
 
   factory DayPlan.fromJson(Map<String, dynamic> j) => DayPlan(
-        date: j['date'] as String,
-        tasks: (j['tasks'] as List? ?? [])
-            .map((e) => PlanTask.fromJson(Map<String, dynamic>.from(e as Map)))
-            .toList(),
-        planSent: j['planSent'] == true,
-        eodSent: j['eodSent'] == true,
-        planMessageId: j['planMessageId'] as String?,
-        planSubject: j['planSubject'] as String?,
-      );
+    date: j['date'] as String,
+    tasks: (j['tasks'] as List? ?? [])
+        .map((e) => PlanTask.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList(),
+    planSent: j['planSent'] == true,
+    eodSent: j['eodSent'] == true,
+    planMessageId: j['planMessageId'] as String?,
+    planSubject: j['planSubject'] as String?,
+  );
 }
 
 class PlannerSettings {
@@ -117,30 +121,30 @@ class PlannerSettings {
 
   bool get emailReady =>
       parseRecipients(to).isNotEmpty &&
-      (sendVia == 'outlook' ||
-          (smtpHost.trim().isNotEmpty &&
-              smtpUser.trim().isNotEmpty &&
-              fromEmail.trim().isNotEmpty));
+          (sendVia == 'outlook' ||
+              (smtpHost.trim().isNotEmpty &&
+                  smtpUser.trim().isNotEmpty &&
+                  fromEmail.trim().isNotEmpty));
 
   Map<String, dynamic> toJson() => {
-        'enabled': enabled,
-        'to': to,
-        'cc': cc,
-        'signature': signature,
-        'planReminder': planReminder,
-        'planHour': planHour,
-        'planMinute': planMinute,
-        'eodReminder': eodReminder,
-        'eodHour': eodHour,
-        'eodMinute': eodMinute,
-        'smtpHost': smtpHost,
-        'smtpPort': smtpPort,
-        'smtpSsl': smtpSsl,
-        'smtpUser': smtpUser,
-        'fromEmail': fromEmail,
-        'sendVia': sendVia,
-        'outlookSimple': outlookSimple,
-      };
+    'enabled': enabled,
+    'to': to,
+    'cc': cc,
+    'signature': signature,
+    'planReminder': planReminder,
+    'planHour': planHour,
+    'planMinute': planMinute,
+    'eodReminder': eodReminder,
+    'eodHour': eodHour,
+    'eodMinute': eodMinute,
+    'smtpHost': smtpHost,
+    'smtpPort': smtpPort,
+    'smtpSsl': smtpSsl,
+    'smtpUser': smtpUser,
+    'fromEmail': fromEmail,
+    'sendVia': sendVia,
+    'outlookSimple': outlookSimple,
+  };
 
   factory PlannerSettings.fromJson(Map<String, dynamic> j) {
     final d = PlannerSettings();
@@ -171,6 +175,9 @@ class Recipient {
   Recipient(this.name, this.email);
 }
 
+/// Parses "a@x.com, Priya Nair <priya@x.com>; b@x.com".
+/// If no display name is given, one is derived from the email
+/// (ravi.kumar@x.com -> Ravi).
 List<Recipient> parseRecipients(String raw) {
   final out = <Recipient>[];
   for (final part in raw.split(RegExp(r'[;,]'))) {

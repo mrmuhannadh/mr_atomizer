@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/planner.dart';
 import '../utils/format.dart';
 import 'planner_storage.dart';
 import 'storage_service.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// Everything needed to send an email by any method.
 class EmailDraft {
@@ -71,24 +71,32 @@ class EmailService {
 
     final rows = <List<String>>[
       for (final t in tasks)
-        [_link(base, t.key), esc(t.summary), esc(hoursLabel(t.estimate))],
+        [
+          _link(base, t.key),
+          esc(t.summary),
+          esc(hoursLabel(t.estimate)),
+          esc(t.status.isEmpty ? '-' : t.status),
+        ],
     ];
-    rows.add(['', '<b>Total</b>', '<b>${esc(hoursLabel(total))}</b>']);
+    rows.add(['', '<b>Total</b>', '<b>${esc(hoursLabel(total))}</b>', '']);
 
     final html = _page('<p>Dear ${esc(g)},</p>'
         '<p>This is the task plan for ${esc(prettyDate(now))},</p>'
-        '${_table(['Jira ID', 'Summary', 'Estimation'], rows)}'
+        '${_table(['Jira ID', 'Summary', 'Estimate', 'Status'], rows)}'
         '${_sign(p)}');
 
     final plain = StringBuffer(
         'Dear $g,\n\nThis is the task plan for ${prettyDate(now)},\n\n');
+    plain.writeln('| Jira ID | Summary | Estimate | Status |');
+    plain.writeln('|---|---|---|---|');
     for (final t in tasks) {
-      plain.writeln('${t.key}  |  ${t.summary}  |  ${hoursLabel(t.estimate)}');
+      plain.writeln(
+          '| ${t.key} | ${t.summary} | ${hoursLabel(t.estimate)} | ${t.status.isEmpty ? '-' : t.status} |');
     }
-    plain.writeln('\nTotal: ${hoursLabel(total)}\n\nRegards,\n${p.signature}');
+    plain.writeln('\nTotal estimate: ${hoursLabel(total)}\n\nRegards,\n${p.signature}');
 
     return EmailDraft(
-      subject: 'Task Plan - ${prettyDate(now)}',
+      subject: 'Task plan for ${prettyDate(now)}',
       html: html,
       plain: plain.toString(),
       to: _emails(p.to),
