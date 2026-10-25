@@ -1,4 +1,3 @@
-
 name: Flutter Multi-Platform Release
 
 on:
@@ -44,7 +43,7 @@ jobs:
           if-no-files-found: error
 
   windows:
-    name: Package Windows ZIP
+    name: Package Windows installer and ZIP
     runs-on: windows-latest
 
     steps:
@@ -61,34 +60,60 @@ jobs:
       - name: Package Windows application
         shell: pwsh
         run: |
-          $candidates = @(
+          $releaseDir = @(
             "build/windows/x64/runner/Release",
             "build/windows/runner/Release"
-          )
-
-          $releaseDir = $candidates |
-            Where-Object { Test-Path "$_/ " .Trim() } |
-            Select-Object -First 1
+          ) | Where-Object { Test-Path $_ } | Select-Object -First 1
 
           if (-not $releaseDir) {
             throw "Windows release directory not found."
           }
 
-          if (-not (Get-ChildItem $releaseDir -Filter *.exe)) {
+          $exe = Get-ChildItem $releaseDir -Filter *.exe | Select-Object -First 1
+          if (-not $exe) {
             throw "No executable found in $releaseDir"
           }
 
-          New-Item -ItemType Directory -Force release-assets |
-            Out-Null
+          # Ship the Visual C++ runtime so the app also starts on PCs without it
+          foreach ($dll in 'msvcp140.dll','vcruntime140.dll','vcruntime140_1.dll') {
+            $src = Join-Path $env:SystemRoot "System32\$dll"
+            if (Test-Path $src) {
+              Copy-Item $src $releaseDir -Force
+            } else {
+              Write-Warning "$dll not found on the runner"
+            }
+          }
 
+          New-Item -ItemType Directory -Force release-assets | Out-Null
+
+          # 1) Portable ZIP
           Compress-Archive `
             -Path "$releaseDir/*" `
-            -DestinationPath "release-assets/jira-notifier-windows.zip"
+            -DestinationPath "release-assets/jira-notifier-windows.zip" `
+            -Force
+
+          # 2) Installer (Program Files + Start menu + desktop shortcut)
+          choco install innosetup -y --no-progress
+
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $source  = (Resolve-Path $releaseDir).Path
+
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "/DMyAppVersion=$version" `
+            "/DMyAppExe=$($exe.Name)" `
+            "/DSourceDir=$source" `
+            "installer/windows.iss"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Inno Setup failed with exit code $LASTEXITCODE"
+          }
 
       - uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: release-assets/jira-notifier-windows.zip
+          path: |
+            release-assets/jira-notifier-windows.zip
+            release-assets/jira-notifier-windows-setup.exe
           if-no-files-found: error
 
   macos:
@@ -142,7 +167,12 @@ jobs:
           cache: true
 
       - run: flutter pub get
-      - run: flutter build ios --release --no-codesign -v 2>&1 | tee ios-build.log
+
+      - name: Build iOS
+        shell: bash
+        run: |
+          set -o pipefail
+          flutter build ios --release --no-codesign -v 2>&1 | tee ios-build.log
 
       - name: Package iOS build output
         shell: bash
@@ -188,6 +218,7 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             release-assets/jira-notifier-android.apk
+            release-assets/jira-notifier-windows-setup.exe
             release-assets/jira-notifier-windows.zip
             release-assets/jira-notifier-macos.zip
             release-assets/jira-notifier-ios-unsigned.zip

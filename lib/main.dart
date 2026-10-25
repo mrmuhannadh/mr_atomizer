@@ -35,7 +35,7 @@ class JiraNotifierApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    title: 'Jira Notifier',
+    title: 'Jira Automizer',
     theme: GlassTheme.light(),
     darkTheme: GlassTheme.dark(),
     themeMode: ThemeMode.system,
