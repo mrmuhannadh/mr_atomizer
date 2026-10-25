@@ -112,7 +112,7 @@ class _EodScreenState extends State<EodScreen> {
         await jira.addWorklog(t.key, secs, start, t.note);
         t.logged = true;
         offset += secs;
-        await PlannerStorage.saveDay(d); // remember, so a retry never double-logs
+        await PlannerStorage.saveDay(d);
       } on DioException catch (e) {
         failures.add('${t.key}: ${_dioMsg(e)}');
       } catch (e) {
