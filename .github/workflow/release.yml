@@ -1,0 +1,187 @@
+
+name: Flutter Multi-Platform Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Package Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build apk --release
+
+      - name: Prepare APK
+        run: |
+          mkdir -p release-assets
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            release-assets/jira-notifier-android.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: release-assets/jira-notifier-android.apk
+          if-no-files-found: error
+
+  windows:
+    name: Package Windows ZIP
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build windows --release
+
+      - name: Package Windows application
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "build/windows/x64/runner/Release",
+            "build/windows/runner/Release"
+          )
+
+          $releaseDir = $candidates |
+            Where-Object { Test-Path "$_/ " .Trim() } |
+            Select-Object -First 1
+
+          if (-not $releaseDir) {
+            throw "Windows release directory not found."
+          }
+
+          if (-not (Get-ChildItem $releaseDir -Filter *.exe)) {
+            throw "No executable found in $releaseDir"
+          }
+
+          New-Item -ItemType Directory -Force release-assets |
+            Out-Null
+
+          Compress-Archive `
+            -Path "$releaseDir/*" `
+            -DestinationPath "release-assets/jira-notifier-windows.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: release-assets/jira-notifier-windows.zip
+          if-no-files-found: error
+
+  macos:
+    name: Package macOS application
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build macos --release
+
+      - name: Package macOS app
+        shell: bash
+        run: |
+          APP_PATH="$(find build/macos/Build/Products/Release \
+            -maxdepth 1 -name '*.app' -print -quit)"
+
+          if [ -z "$APP_PATH" ]; then
+            echo "No macOS .app bundle found."
+            exit 1
+          fi
+
+          mkdir -p release-assets
+
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP_PATH" \
+            release-assets/jira-notifier-macos.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-release
+          path: release-assets/jira-notifier-macos.zip
+          if-no-files-found: error
+
+  ios:
+    name: Package unsigned iOS build
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
+
+      - name: Package iOS build output
+        shell: bash
+        run: |
+          APP_PATH="build/ios/iphoneos/Runner.app"
+
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Expected iOS app bundle not found: $APP_PATH"
+            exit 1
+          fi
+
+          mkdir -p release-assets
+
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP_PATH" \
+            release-assets/jira-notifier-ios-unsigned.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-release
+          path: release-assets/jira-notifier-ios-unsigned.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs: [android, windows, macos, ios]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all build packages
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          pattern: "*-release"
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Jira Notifier ${{ github.ref_name }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            release-assets/jira-notifier-android.apk
+            release-assets/jira-notifier-windows.zip
+            release-assets/jira-notifier-macos.zip
+            release-assets/jira-notifier-ios-unsigned.zip
